@@ -16,12 +16,6 @@
         $conn = mysqli_connect("localhost", "root", "","dbresto","3307") or die("Unable to connect! ".mysqli_error());
         mysqli_select_db($conn, "dbresto");
 
-         // Check if session is started and user is logged in
-        if (!isset($_SESSION['username'])) {
-        header("Location: login.php");
-        exit;
-        }
-
         // Retrieve user information (including password for verification)
         $username = $_SESSION['username'];
         $stmt = $conn->prepare("SELECT password, role FROM users WHERE username = ?");
@@ -44,7 +38,7 @@
             errorWindow("Invalid user.", "Back");
             exit;
         }
-
+    
     ?>
 
     <p>Active User: <b style="text-align: left;"><?php echo $_SESSION['username']; ?></b></p>
