@@ -6,72 +6,50 @@
 </head>
 <body>
     <div class="login">
-    <?php
-    // Initialize
-    include("functions.php");
-    error_reporting(E_ERROR | E_PARSE);
-    session_start();
+        <?php
+            // Initialize
+            include("functions.php");
+            error_reporting(E_ERROR | E_PARSE);
+            session_start();
 
-    // Open db to select from tbladmin
-    $conn = mysqli_connect("localhost", "root", "", "dbresto", "3307") or die("Unable to connect! ".mysqli_error());
-    mysqli_select_db($conn, "dbresto");
+            // Open db to select from tbladmin
+            //add to DB
+            $conn = mysqli_connect("localhost", "root", "","dbresto","3307") or die("Unable to connect! ".mysqli_error());
+            mysqli_select_db($conn, "dbresto");
 
-    // Function to write log
-    function writeLog($message) {
-        $logFile = 'login_attempts.log';
-        $timestamp = date('Y-m-d H:i:s');
-        $logMessage = "$timestamp - $message" . PHP_EOL;
-        file_put_contents($logFile, $logMessage, FILE_APPEND);
-    }
+            // Checking if session hasn't started yet
+            if(!isset($_SESSION['username'], $_SESSION['password'])) {
+                $username = $_POST['username'];
+                $password = $_POST['password'];
 
-    // Check if form is submitted
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        // reCAPTCHA verification
-        $recaptchaSecret = "6LdpOPMpAAAAALqmJKMKcVtPmVLMwAtO0icKthkT";
-        $recaptchaResponse = $_POST['g-recaptcha-response'];
+                // First check: if user is not logged in, hide page
+                if(!isset($_POST['username'], $_POST['password'])) {
+                    errorWindow("No logged in user detected.", "Log In");
+                }
+            
+                // Check if username exists
+                $usernameSelect = "SELECT username FROM `tbladmin` WHERE username='$username'";
+                $usernameQuery = mysqli_query($conn, $usernameSelect);
+                if(mysqli_num_rows($usernameQuery) == 0) {
+                    errorWindow("Couldn't find your account. Please try again.", "Back");
+                } else {
+                    // Check if password is correct
+                    $passwordSelect = "SELECT password FROM `tbladmin` WHERE username='$username'";
+                    $passwordQuery = mysqli_query($conn, $passwordSelect);
+                    $passwordResult = mysqli_fetch_assoc($passwordQuery);
+                    if($passwordResult['password'] != $password) {
+                        errorWindow("Wrong password. Please try again.", "Back");
+                    }
+                }
 
-        $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=$recaptchaSecret&response=$recaptchaResponse");
-        $responseKeys = json_decode($response, true);
+                // Close db
+                mysqli_close($conn);
 
-        if (intval($responseKeys["success"]) !== 1) {
-            writeLog("Failed reCAPTCHA for username: $username");
-            errorWindow("Please complete the reCAPTCHA", "Back");
-            exit;
-        }
-
-        // Proceed with login checks if reCAPTCHA is verified
-        $username = $_POST['username'];
-        $password = $_POST['password'];
-
-        // Check if username exists
-        $usernameSelect = "SELECT username FROM `tbladmin` WHERE username='$username'";
-        $usernameQuery = mysqli_query($conn, $usernameSelect);
-        if(mysqli_num_rows($usernameQuery) == 0) {
-            writeLog("Failed login attempt for non-existing username: $username");
-            errorWindow("Couldn't find your account. Please try again.", "Back");
-        } else {
-            // Check if password is correct
-            $passwordSelect = "SELECT password FROM `tbladmin` WHERE username='$username'";
-            $passwordQuery = mysqli_query($conn, $passwordSelect);
-            $passwordResult = mysqli_fetch_assoc($passwordQuery);
-            if($passwordResult['password'] != $password) {
-                writeLog("Failed login attempt for username: $username - Incorrect password");
-                errorWindow("Wrong password. Please try again.", "Back");
-            } else {
-                writeLog("Successful login for username: $username");
+                // Once checks are done, set variables for session
                 $_SESSION['username'] = $username;
                 $_SESSION['password'] = $password;
             }
-        }
-
-        // Close db
-        mysqli_close($conn);
-    } else {
-        writeLog("No login attempt detected.");
-        errorWindow("No logged in user detected.", "Log In");
-    }
-?>
-
+        ?>
 
         <!-- Actual admin page, if login is successful -->
         Active User: <b style="text-align: left;"><?php echo $_SESSION['username']; ?></b>

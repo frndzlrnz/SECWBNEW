@@ -19,8 +19,9 @@
 
             <div class="g-recaptcha" data-sitekey="6LdpOPMpAAAAAJ_QkvPEDLdd32FyZMknQMsnj_E8"></div>
             <p><input type="submit" class="btn" value="Login" name="submitbtn"></p>
-        </form><br>
+        </form>
         <a href="welcome.php"><button class="btn">Back</button></a><br><br>
+        <a href="registration.php"><button class="btn">Register</button></a><br><br>
     </center></div>
 </body>
 </html>

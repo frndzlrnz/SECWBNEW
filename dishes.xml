@@ -66,10 +66,18 @@
   </dish>
   <dish>
     <id>10</id>
+<<<<<<< HEAD
+    <name>Maccas</name>
+    <group>Sides</group>
+    <price>1</price>
+    <quantity>2</quantity>
+    <image>adobo.jpg</image>
+=======
     <name>Barbeque</name>
     <group>Mains</group>
     <price>150</price>
     <quantity>5</quantity>
     <image>barbeque.jpg</image>
+>>>>>>> d135e1714ed8a9269dbd4656fa534e1618e96eaf
   </dish>
 </dishes>
