@@ -1,0 +1,103 @@
+body{
+    background-image: url("images/foodbg.jpg");
+    background-repeat: no-repeat;
+    background-size: cover; 
+    font-family: system-ui;
+}   
+.mainbox{
+    background-color: white;
+    position: absolute;
+    top: 10%;
+    left: 10%;
+    right: 10%;
+    margin: auto;
+    width: 80%;
+    border:2px solid black;
+    padding: 20px 30px;
+    border-radius: 25px;
+}
+.form{
+    /*border: 1px solid red;*/
+    display: inline-block;
+    margin: 0 auto;
+    padding: 3px; 
+}
+.label{
+    font-size: 20px;
+}
+#namelabel{
+    padding-right: 30px;
+}
+#addresslabel{
+    padding-right: 11px;
+}
+.name{
+    width: 40%;
+    padding: 10px 15px;
+    margin: 8px, 0;
+    display: inline-block;
+    border: 1px solid grey;
+    box-sizing: border-box;
+}
+.address{
+    width: 70%;
+    padding: 10px 15px;
+    margin: 8px, 0;
+    display: inline-block;
+    border: 1px solid grey;
+    box-sizing: border-box;
+}
+
+.payment{
+    width: 25%;
+    padding: 10px 15px;
+    margin: 8px, 0;
+    display: inline-block;
+    border: 1px solid grey;
+    box-sizing: border-box;
+}
+
+input[type=number]{
+    width: 20%;
+    padding: 10px 15px;
+    margin: 8px, 0;
+    display: inline-block;
+    border: 1px solid grey;
+    box-sizing: border-box;
+}
+.field{
+    margin-top: 10px;
+}
+.btn{
+    background-color: #1C1F25;
+    margin-top: 40px;
+    margin-right: 50px;
+    padding: 10px;
+    width: 100px;
+    font-size: 20px;
+    color:white;
+    border-radius: 15px;
+    border: none;
+    cursor: pointer;
+}
+#creditbox{
+    width: 10px;
+    height: auto;
+}
+#img{
+    padding: 9px;
+    width: 180px; 
+    float: right;
+}
+.homebtn{
+    background-color: #1C1F25;
+    margin-top: 40px;
+    margin-right: 50px;
+    padding: 10px;
+    width: 200px;
+    font-size: 20px;
+    color:white;
+    border-radius: 15px;
+    border: none;
+    cursor: pointer;
+}

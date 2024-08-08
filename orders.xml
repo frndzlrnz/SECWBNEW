@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<orders>
+	<order date="">
+		<dateGenerated/>
+		<timeGenerated/>
+		<dishesSold/>
+		<totalAmt/>
+		<totalDiscount/>
+	</order>
+
+	<order date="2023-08-05"><dateGenerated>2023-08-05</dateGenerated><timeGenerated>10:38:55am</timeGenerated><dishesSold>4</dishesSold><totalAmt>3144.00</totalAmt><totalDiscount>346.00</totalDiscount></order>
+<order date="2023-08-05"><dateGenerated>2023-08-05</dateGenerated><timeGenerated>02:56:25pm</timeGenerated><dishesSold>6</dishesSold><totalAmt>4510.50</totalAmt><totalDiscount>389.50</totalDiscount></order>
+</orders>

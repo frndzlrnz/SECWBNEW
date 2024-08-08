@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:element name="combos">
+		<xsd:complexType>
+			<xsd:sequence>
+
+				<xsd:element name="combo" minOccurs="1" maxOccurs="unbounded">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="main" type="xsd:string" />
+							<xsd:element name="sides" type="xsd:string" />
+							<xsd:element name="drinks" type="xsd:string" />
+                            <xsd:element name="discount" type="xsd:integer" />
+						</xsd:sequence>
+					</xsd:complexType>
+                </xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<combos>
+  <combo>
+    <main>Chicken</main>
+    <sides>Mashed</sides>
+    <drinks>Iced Tea</drinks>
+    <discount>15</discount>
+  </combo>
+<dish><main>Fish</main><sides>Asd</sides><drink>dsa</drink><discount>25</discount></dish><dish><main>Fish</main><sides>Asd</sides><drink>dsa</drink><discount>25</discount></dish><dish><main>Fish</main><sides>Asd</sides><drink>dsa</drink><discount>25</discount></dish><dish><main>Fish</main><sides>Asd</sides><drink>dsa</drink><discount>25</discount></dish></combos>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dishes>
+  <dish>
+    <id>1</id>
+    <name>Meat</name>
+    <group>Mains</group>
+    <price>500</price>
+    <quantity>5</quantity>
+    <image>steak.png</image>
+  </dish>
+  <dish>
+    <id>2</id>
+    <name>Not Salmon</name>
+    <group>Mains</group>
+    <price>850</price>
+    <quantity>12</quantity>
+    <image>salmon.png</image>
+  </dish>
+  <dish>
+    <id>3</id>
+    <name>Chicken</name>
+    <group>Mains</group>
+    <price>300.00</price>
+    <quantity>3</quantity>
+    <image>chicken.png</image>
+  </dish>
+  <dish>
+    <id>4</id>
+    <name>Baked Potato</name>
+    <group>Sides</group>
+    <price>80.00</price>
+    <quantity>14</quantity>
+    <image>bakedpot.png</image>
+  </dish>
+  <dish>
+    <id>5</id>
+    <name>Mashed Potato</name>
+    <group>Sides</group>
+    <price>75.00</price>
+    <quantity>10</quantity>
+    <image>mashedpot.png</image>
+  </dish>
+  <dish>
+    <id>6</id>
+    <name>Steamed Vegetables</name>
+    <group>Sides</group>
+    <price>50.00</price>
+    <quantity>4</quantity>
+    <image>steamedveg.png</image>
+  </dish>
+  <dish>
+    <id>7</id>
+    <name>Ice Tea</name>
+    <group>Drink</group>
+    <price>55.00</price>
+    <quantity>5</quantity>
+    <image>icedtea.png</image>
+  </dish>
+  <dish>
+    <id>8</id>
+    <name>Root Beer</name>
+    <group>Drink</group>
+    <price>60.00</price>
+    <quantity>23</quantity>
+    <image>rootbeer.png</image>
+  </dish>
+<dish><id>9</id><name>Water</name><group>Drink</group><price>25</price><quantity>3</quantity><image>water.png</image></dish><dish><id>10</id><name>Barbeque</name><group>Mains</group><price>150</price><quantity>5</quantity><image>barbeque.jpg</image></dish></dishes>
