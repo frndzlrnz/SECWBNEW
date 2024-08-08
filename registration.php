@@ -8,10 +8,14 @@ $password = "";
 $dbname = "dbresto";
 $port = "3306";
 
+// Log file path
+$logFile = 'logs/registration.log';
+
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname, $port);
 // Check connection
 if ($conn->connect_error) {
+    error_log("Connection failed: " . $conn->connect_error, 3, $logFile);
     die("Connection failed: " . $conn->connect_error);
 }
 
@@ -25,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $profilePhoto = $_FILES['profilePhoto'];
     $role = 'user'; // Default role
     $error = '';
+
     // Magic numbers for JPEG and PNG
     $jpegMagicNumber = "\xFF\xD8\xFF\xE0";
     $pngMagicNumber = "\x89\x50\x4E\x47\x0D\x0A\x1A\x0A";
@@ -32,34 +37,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Validate email
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = 'Invalid email format.';
-    } 
-    elseif (!preg_match("/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/", $email)) {
-      $error = 'Invalid email format.';
+        error_log($error, 3, $logFile);
+    } elseif (!preg_match("/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/", $email)) {
+        $error = 'Invalid email format.';
+        error_log($error, 3, $logFile);
     }
-    // Validate phone number (09XX XXX XXXX or +639XX XXX XXXX)
+    // Validate phone number
     elseif (!preg_match("/^(09|\+639)\d{9}$/", $phone)) {
         $error = 'Invalid phone number format. Use format: 09XXXXXXXXX or +639XXXXXXXXX.';
+        error_log($error, 3, $logFile);
     }
     // Validate password
     elseif ($password !== $confirmPassword) {
         $error = 'Passwords do not match.';
-    } 
-    elseif (!preg_match("/^[a-zA-Z ]+$/", $username)) {
-      $error = 'Username should contain only characters';
-    }
-    elseif (!preg_match("#[0-9]+#", $password)) {
-      $error = 'Password should contain atleast 1 digit';
-    }
-    elseif (!preg_match("#[a-z]+#", $password)) {
-      $error = 'Password should contain atleast 1 lowercase char';
-    }
-    elseif (!preg_match("#[A-Z]+#", $password)) {
-      $error = 'Password should contain atleast 1 uppercase char';
-    }
-    elseif (strlen($password) < 8) {
-      $error = 'Password should atleast be 8 digits';
-    }
-    else {
+        error_log($error, 3, $logFile);
+    } elseif (!preg_match("/^[a-zA-Z ]+$/", $username)) {
+        $error = 'Username should contain only characters';
+        error_log($error, 3, $logFile);
+    } elseif (!preg_match("#[0-9]+#", $password)) {
+        $error = 'Password should contain at least 1 digit';
+        error_log($error, 3, $logFile);
+    } elseif (!preg_match("#[a-z]+#", $password)) {
+        $error = 'Password should contain at least 1 lowercase char';
+        error_log($error, 3, $logFile);
+    } elseif (!preg_match("#[A-Z]+#", $password)) {
+        $error = 'Password should contain at least 1 uppercase char';
+        error_log($error, 3, $logFile);
+    } elseif (strlen($password) < 8) {
+        $error = 'Password should be at least 8 characters';
+        error_log($error, 3, $logFile);
+    } else {
         // Generate a random salt
         $salt = bin2hex(random_bytes(5));
         // Combine the salt with the password
@@ -79,40 +86,45 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $fileHeader = fread($fileHandle, 8);
                 fclose($fileHandle);
                 if (substr($fileHeader, 0, 4) === $jpegMagicNumber) {
-                  $fileType = 'jpeg';
+                    $fileType = 'jpeg';
                 } elseif (substr($fileHeader, 0, 8) === $pngMagicNumber) { // Check for PNG magic number
-                  $fileType = 'png';
+                    $fileType = 'png';
                 } else {
-                  $error = 'Invalid image file format.';
-                  // Handle error
+                    $error = 'Invalid image file format.';
+                    error_log($error, 3, $logFile);
                 }
                 
                 $photoContent = addslashes(file_get_contents($profilePhoto['tmp_name']));
                 $sql = "INSERT INTO users (fullName, username, email, phone, password, salt, profilePhoto, role) VALUES ('$fullName', '$username', '$email', '$phone', '$hashedPassword', '$salt', '$photoContent', '$role')";
 
-if ($conn->query($sql) === TRUE) {
-    echo "<script>
-            if (confirm('Are you sure that you\\'ve put down all the correct information?')) {
-                window.location.href = 'login.php';
-            } else {
-                window.location.href = 'registration.php'; // Redirect back to registration page
-            }
-          </script>";
-    exit;
-} else {
-    $error = 'Failed to save user data: ' . $conn->error;
+                if ($conn->query($sql) === TRUE) {
+                    error_log("User registered successfully: $email", 3, $logFile);
+                    echo "<script>
+                            if (confirm('Are you sure that you\\'ve put down all the correct information?')) {
+                                window.location.href = 'login.php';
+                            } else {
+                                window.location.href = 'registration.php'; // Redirect back to registration page
+                            }
+                          </script>";
+                    exit;
+                } else {
+                    $error = 'Failed to save user data: ' . $conn->error;
+                    error_log($error, 3, $logFile);
                 }
             } else {
                 $error = 'Profile photo upload error.';
+                error_log($error, 3, $logFile);
             }
         } else {
             $error = 'Invalid file type. Only JPG, PNG files are allowed.';
+            error_log($error, 3, $logFile);
         }
     }
 }
 
 $conn->close();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
