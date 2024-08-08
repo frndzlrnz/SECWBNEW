@@ -6,7 +6,7 @@ $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "dbresto";
-$port = "3307";
+$port = "3306";
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname, $port);
@@ -139,6 +139,7 @@ $conn->close();
     }
     .form-group {
       margin-bottom: 20px;
+      position: relative; /* For positioning the eye icon */
     }
     label {
       display: block;
@@ -153,6 +154,25 @@ $conn->close();
       padding: 10px;
       border: 1px solid #ccc;
       border-radius: 5px;
+    }
+    .toggle-password {
+      position: absolute;
+      right: 5%;
+      top: 25px;
+      cursor: pointer;
+      font-size: 18px;
+    }
+    .strength-meter {
+      height: 5px;
+      margin-top: 5px;
+      background-color: #ccc;
+      border-radius: 3px;
+    }
+    .strength-meter div {
+      height: 100%;
+      width: 0;
+      border-radius: 3px;
+      transition: width 0.3s;
     }
     input[type="submit"] {
       width: 100%;
@@ -171,14 +191,112 @@ $conn->close();
       text-align: center;
       margin-bottom: 20px;
     }
+    #password-requirements {
+    list-style-type: none;
+    padding: 0;
+    margin: 10px 0 0 0;
+    font-size: 0.9em;
+    color: #ff0000; /* Red for invalid requirements */
+    }
+
+  #password-requirements .valid {
+    color: #28a745; /* Green for valid requirements */
+    }
+
   </style>
   <script>
-    function confirmSubmission() {
-      return confirm('Are you sure that you\\'ve put down all the correct information?');
+    // Function to toggle password visibility
+    function togglePasswordVisibility(id) {
+      var passwordField = document.getElementById(id);
+      var toggleIcon = passwordField.nextElementSibling;
+      if (passwordField.type === "password") {
+        passwordField.type = "text";
+        toggleIcon.textContent = "🙈"; // Hide eyes
+      } else {
+        passwordField.type = "password";
+        toggleIcon.textContent = "👁️"; // Show eyes
+      }
     }
+
+// Function to update password strength and requirement validity
+function updatePasswordStrength(password) {
+  var strengthBar = document.getElementById('strength-bar');
+  var strength = 0;
+
+  // Requirement elements
+  var lengthRequirement = document.getElementById('length');
+  var uppercaseRequirement = document.getElementById('uppercase');
+  var lowercaseRequirement = document.getElementById('lowercase');
+  var numberRequirement = document.getElementById('number');
+  var specialRequirement = document.getElementById('special');
+
+  // Check password length
+  if (password.length >= 8) {
+    strength++;
+    lengthRequirement.classList.remove('invalid');
+    lengthRequirement.classList.add('valid');
+  } else {
+    lengthRequirement.classList.remove('valid');
+    lengthRequirement.classList.add('invalid');
+  }
+
+  // Check for uppercase characters
+  if (/[A-Z]/.test(password)) {
+    strength++;
+    uppercaseRequirement.classList.remove('invalid');
+    uppercaseRequirement.classList.add('valid');
+  } else {
+    uppercaseRequirement.classList.remove('valid');
+    uppercaseRequirement.classList.add('invalid');
+  }
+
+  // Check for lowercase characters
+  if (/[a-z]/.test(password)) {
+    strength++;
+    lowercaseRequirement.classList.remove('invalid');
+    lowercaseRequirement.classList.add('valid');
+  } else {
+    lowercaseRequirement.classList.remove('valid');
+    lowercaseRequirement.classList.add('invalid');
+  }
+
+  // Check for digits
+  if (/[0-9]/.test(password)) {
+    strength++;
+    numberRequirement.classList.remove('invalid');
+    numberRequirement.classList.add('valid');
+  } else {
+    numberRequirement.classList.remove('valid');
+    numberRequirement.classList.add('invalid');
+  }
+
+  // Check for special characters
+  if (/[\W]/.test(password)) {
+    strength++;
+    specialRequirement.classList.remove('invalid');
+    specialRequirement.classList.add('valid');
+  } else {
+    specialRequirement.classList.remove('valid');
+    specialRequirement.classList.add('invalid');
+  }
+
+  var strengthColors = ["#ccc", "red", "orange", "yellow", "green"];
+  strengthBar.style.width = (strength * 20) + "%";
+  strengthBar.style.backgroundColor = strengthColors[strength];
+}
+
+
+    // Event listener to update password strength as the user types
+    document.addEventListener('DOMContentLoaded', function () {
+      var passwordField = document.getElementById('password');
+      passwordField.addEventListener('input', function () {
+        updatePasswordStrength(this.value);
+      });
+    });
   </script>
 </head>
 <body>
+  
   <div class="container">
     <h2>Registration</h2>
     <?php if (isset($error)) { ?>
@@ -192,10 +310,22 @@ $conn->close();
       <div class="form-group">
         <label for="password">Password:</label>
         <input type="password" id="password" name="password" required>
+        <span class="toggle-password" onclick="togglePasswordVisibility('password')">👁️</span>
+        <div class="strength-meter">
+          <div id="strength-bar"></div>
+        </div>
+        <ul id="password-requirements">
+          <li id="length" class="invalid">At least 8 characters</li>
+          <li id="uppercase" class="invalid">At least 1 uppercase letter</li>
+          <li id="lowercase" class="invalid">At least 1 lowercase letter</li>
+          <li id="number" class="invalid">At least 1 digit</li>
+          <li id="special" class="invalid">At least 1 special character</li>
+        </ul>
       </div>
       <div class="form-group">
         <label for="confirmPassword">Confirm Password:</label>
         <input type="password" id="confirmPassword" name="confirmPassword" required>
+        <span class="toggle-password" onclick="togglePasswordVisibility('confirmPassword')">👁️</span>
       </div>
       <div class="form-group">
         <label for="fullName">Full Name:</label>
