@@ -19,8 +19,7 @@
             mouth-watering food! Try our combos!</p>
         </div>
         
-        <p><a href="main.php"><button class="btn_large" style="background-color: #0e7802">Order Now!</button></a></p>
-        <p><a href="login.php"><button class="btn_large" style="background-color: #1C1F25">Admin Login</button></a></p>
+        <p><a href="login.php"><button class="btn_large" style="background-color: #1C1F25">Login</button></a></p>
     </div>
 
     <div class="content-right">

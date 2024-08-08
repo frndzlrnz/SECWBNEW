@@ -64,4 +64,20 @@
     <quantity>23</quantity>
     <image>rootbeer.png</image>
   </dish>
-<dish><id>9</id><name>Water</name><group>Drink</group><price>25</price><quantity>3</quantity><image>water.png</image></dish><dish><id>10</id><name>Barbeque</name><group>Mains</group><price>150</price><quantity>5</quantity><image>barbeque.jpg</image></dish></dishes>
+  <dish>
+    <id>9</id>
+    <name>Water</name>
+    <group>Drink</group>
+    <price>25</price>
+    <quantity>3</quantity>
+    <image>water.png</image>
+  </dish>
+  <dish>
+    <id>10</id>
+    <name>Maccas</name>
+    <group>Sides</group>
+    <price>1</price>
+    <quantity>2</quantity>
+    <image>adobo.jpg</image>
+  </dish>
+</dishes>
