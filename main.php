@@ -12,12 +12,15 @@
 
 <body class="">
     
+
     <div class="container">
         <header>
             <h1>Online Ordering</h1>
+           
             <div class="shopping">
                 <img src="images/shopping.svg">
                 <span class="quantity">0</span>
+                <a href="logout.php"><img src="images/logout.png" class="logout-icon"></a>
             </div>
         </header>
 

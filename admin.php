@@ -9,14 +9,28 @@
     <?php
     // Initialize
     include("functions.php");
-    error_reporting(E_ERROR | E_PARSE);
-    session_start();
+    // Define debug flag (set to true for development)
+    define('DEBUG', true); // Change to false for production
+
+    // Error reporting level based on debug flag
+    if (DEBUG) {
+        error_reporting(E_ALL); // Show all errors with stack trace
+    } else {
+        error_reporting(E_ERROR | E_PARSE); // Show only fatal errors
+    }
+    
     session_set_cookie_params(1800);
+    session_start();
 
-    // Open db to select from tbladmin
-    $conn = mysqli_connect("localhost", "root", "", "dbresto", "3307") or die("Unable to connect! ".mysqli_error());
-    mysqli_select_db($conn, "dbresto");
 
+    $errorMessage = null; // Initialize error message variable
+    try {
+        // Open db to select from tbladmin
+        $conn = mysqli_connect("localhost", "root", "", "dbresto", "3307");
+        if (!$conn) {
+            throw new Exception("Database connection failed: " . mysqli_connect_error());
+        }
+        mysqli_select_db($conn, "dbresto");
     // Function to write log
     function writeLog($message) {
         $logFile = 'login_attempts.log';
@@ -66,7 +80,7 @@
 
         // Close db
         mysqli_close($conn);
-
+        
         // Once checks are done, set variables for session
         $_SESSION['username'] = $username;
         $_SESSION['password'] = $password;
@@ -90,6 +104,14 @@
           errorWindow("Please verify you are not a robot.", "Back");
           exit();
         }
+    }
+}
+} catch (Exception $e) {
+    if (DEBUG) {
+        error_log("Error: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+        $errorMessage = "An error occurred. Please try again later.";
+    } else {
+        $errorMessage = "An error occurred. Please try again later.";
     }
 }
 ?>

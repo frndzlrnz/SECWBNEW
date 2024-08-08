@@ -1,6 +1,7 @@
 <?php
-session_start();
-session_set_cookie_params(1800);
+    session_set_cookie_params(1800);
+    session_start();
+
 
 // Database connection settings
 $servername = "localhost";

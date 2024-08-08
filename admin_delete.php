@@ -10,9 +10,18 @@
     <?php
         // Initialize
         include("functions.php");
-        error_reporting(E_ERROR | E_PARSE);
-        session_start();
-        session_set_cookie_params(1800);
+        // Define debug flag (set to true for development)
+    define('DEBUG', true); // Change to false for production
+
+    // Error reporting level based on debug flag
+    if (DEBUG) {
+        error_reporting(E_ALL); // Show all errors with stack trace
+    } else {
+        error_reporting(E_ERROR | E_PARSE); // Show only fatal errors
+    }
+    session_set_cookie_params(1800);
+    session_start();
+
         //add to DB
         $conn = mysqli_connect("localhost", "root", "","dbresto","3307") or die("Unable to connect! ".mysqli_error());
         mysqli_select_db($conn, "dbresto");
