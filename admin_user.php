@@ -15,6 +15,16 @@
         if(!isset($_SESSION['username'], $_SESSION['password'])) {
             errorWindow("No logged in user detected.", "Log In");
         }
+
+        // Function to log the creation of a new user
+        function logUserCreation($username) {
+            $logFile = 'user_creation_log.txt'; // Log file location
+            $currentDate = date('Y-m-d H:i:s');
+            $logMessage = "User: $username was created at $currentDate\n";
+
+            // Append the log message to the log file
+            file_put_contents($logFile, $logMessage, FILE_APPEND);
+        }
     ?>
 
     <p>Active User: <b style="text-align: left;"><?php echo $_SESSION['username']; ?></b></p>
@@ -45,7 +55,7 @@
             $password = $_POST['password'];
             $confPassword = $_POST['conf_password'];
 
-            //add to DB
+            // Add to DB
             $conn = mysqli_connect("localhost", "root", "","dbresto","3307") or die("Unable to connect! ".mysqli_error());
             mysqli_select_db($conn, "dbresto");
 
@@ -58,9 +68,12 @@
             } else if($password !== $confPassword) { // password and confirm password don't match
                 echo "<p style='color:red'><b>Passwords do not match. Please try again.<b></p>";
             } else {
-                // Add dish to db
+                // Add user to DB
                 $addString = "INSERT INTO `tbladmin` (`username`, `password`) VALUES ('$username','$password')";
                 mysqli_query($conn, $addString);
+
+                // Log the creation of the new user
+                logUserCreation($username);
 
                 echo "<p style='color:green'><b>User added successfully!<b></p>";
             }

@@ -1,0 +1,1 @@
+User: admin updated dish ID: 2 on 2024-08-08 18:44:04. Old Values - Name: Salmon, Category: Mains, Price: 200, Quantity: 1. New Values - Name: Salmon, Category: Mains, Price: 200, Quantity: 1
