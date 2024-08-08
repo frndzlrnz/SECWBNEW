@@ -12,3 +12,12 @@
 2024-08-08 21:36:12 - No login attempt detected.
 2024-08-08 21:37:42 - No login attempt detected.
 2024-08-08 21:45:40 - Failed reCAPTCHA for username : Login attempt blocked.
+2024-08-08 22:04:37 - Failed login attempt for non-existing username: 123213
+2024-08-08 22:04:47 - Failed login attempt for username: admin - Incorrect password
+2024-08-08 22:05:13 - Successful login for username: admin
+2024-08-08 22:10:57 - Failed login attempt for non-existing username: 123123
+2024-08-08 22:11:11 - Failed login attempt for username: evan - Incorrect password
+2024-08-08 22:14:13 - Failed login attempt for username: evan - Incorrect password
+2024-08-08 22:17:19 - Failed login attempt for username: evan - Incorrect password
+2024-08-08 22:18:26 - Failed login attempt for username: evan - Incorrect password
+2024-08-08 22:20:13 - Failed login attempt for username: evan - Incorrect password

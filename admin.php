@@ -16,11 +16,6 @@
     $conn = mysqli_connect("localhost", "root", "", "dbresto", "3307") or die("Unable to connect! ".mysqli_error());
     mysqli_select_db($conn, "dbresto");
 
-    // Check connection
-    if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-    }
-
     // Function to write log
     function writeLog($message) {
         $logFile = 'login_attempts.log';
@@ -29,60 +24,102 @@
         file_put_contents($logFile, $logMessage, FILE_APPEND);
     }
 
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        // Verify the CAPTCHA response
-        $recaptchaSecret = "6LdpOPMpAAAAALqmJKMKcVtPmVLMwAtO0icKthkT";
-        $recaptchaResponse = $_POST['g-recaptcha-response'];
-        $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=$recaptchaSecret&response=$recaptchaResponse");
-        $responseKeys = json_decode($response, true);
+    // // Check if form is submitted
+    // if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    //     // reCAPTCHA verification
+    //     $recaptchaSecret = "6LdpOPMpAAAAALqmJKMKcVtPmVLMwAtO0icKthkT";
+    //     $recaptchaResponse = $_POST['g-recaptcha-response'];
 
-        if (intval($responseKeys["success"]) !== 1) {
-          $error = "Please complete the reCAPTCHA.";
-          writeLog("Failed reCAPTCHA for username $username: Login attempt blocked.");
-          exit;
-        } else {
-          // Proceed with login checks only if reCAPTCHA is verified
-          $username = $_POST['username'];
-          $password = $_POST['password'];
+    //     $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=$recaptchaSecret&response=$recaptchaResponse");
+    //     $responseKeys = json_decode($response, true);
 
-          // Prepare and execute SQL statement to retrieve hashed password, salt, and role for the provided username
-          $stmt = $conn->prepare("SELECT password, salt, role FROM users WHERE username = ?");
-          $stmt->bind_param("s", $username);
-          $stmt->execute();
-          $stmt->store_result();
+    //     if (intval($responseKeys["success"]) !== 1) {
+    //         writeLog("Failed reCAPTCHA for username: $username");
+    //         errorWindow("Please complete the reCAPTCHA", "Back");
+    //         exit;
+    //     }
 
-          if ($stmt->num_rows == 1) {
-            $stmt->bind_result($hashedPassword,$salt, $role);
-            $stmt->fetch();
+    //     // Proceed with login checks if reCAPTCHA is verified
+    //     $username = $_POST['username'];
+    //     $password = $_POST['password'];
 
-            // Verify the provided password against the hashed password from the database
-            $saltedPassword = $password . $salt;
-            if (password_verify($hashedPassword, $saltedPassword)) {
-              // Password is correct, set session variables
-              $_SESSION['loggedin'] = true;
-              $_SESSION['username'] = $username;
-              $_SESSION['role'] = $role;
+    //     // Check if username exists
+    //     $usernameSelect = "SELECT username, salt FROM `users` WHERE username=?";
+    //     $stmt = $conn->prepare($usernameSelect);
+    //     $stmt->bind_param("s", $username);
+    //     $stmt->execute();
+    //     $stmt->store_result();
 
-              // Redirect based on role
-              if ($role === 'user') {
-                header("Location: main.php");
-              } else {
-                header("Location: admin.php");
-              }
-              exit;
-            } else {
-              $error = "Invalid username or password.";
-            }
-          } else {
-            $error = "Invalid username or password.";
-          }
+    //     if ($stmt->num_rows == 0) {
+    //         writeLog("Failed login attempt for non-existing username: $username");
+    //         errorWindow("Couldn't find your account. Please try again.", "Back");
+    //     } else {
+    //         $stmt->bind_result($username, $salt); // Retrieve username and salt
+    //         $stmt->fetch();
 
-          $stmt->close();
+    //         // Verify the password using password_verify
+    //         if (password_verify($password, $salt)) {
+    //         // Password is correct
+    //         writeLog("Successful login for username: $username");
+    //         $_SESSION['username'] = $username;
+    //         exit;
+    //         } else {
+    //         writeLog("Failed login attempt for username: $username - Incorrect password");
+    //         errorWindow("Wrong password. Please try again.", "Back");
+    //         }
+    //     }
+    //     mysqli_close($conn);
+    //     } else {
+    //     writeLog("No login attempt detected.");
+    //     errorWindow("No logged in user detected.", "Log In");
+    //     }
+
+      // Checking if session hasn't started yet
+      if(!isset($_SESSION['username'], $_SESSION['password'])) {
+        $username = $_POST['username'];
+        $password = $_POST['password'];
+
+        // First check: if user is not logged in, hide page
+        if(!isset($_POST['username'], $_POST['password'])) {
+            errorWindow("No logged in user detected.", "Log In");
         }
-      }
+    
+        // Check if username exists
+        $usernameSelect = "SELECT username FROM `users` WHERE username='$username'";
+        $usernameQuery = mysqli_query($conn, $usernameSelect);
+        if(mysqli_num_rows($usernameQuery) == 0) {
+            errorWindow("Couldn't find your account. Please try again.", "Back");
+        } else {
+            // Check if password is correct
+            $passwordSelect = "SELECT password FROM `users` WHERE username='$username'";
+            $passwordQuery = mysqli_query($conn, $passwordSelect);
+            $passwordResult = mysqli_fetch_assoc($passwordQuery);
 
-      $conn->close();
+            $stmt = $conn->prepare("SELECT password, role FROM users WHERE username = ?");
+            $stmt->bind_param("s", $username);
+            $stmt->execute();
+            $stmt->store_result();
+            if ($stmt->num_rows == 1) {
+                $stmt->bind_result($hashedPassword, $role);
+                $stmt->fetch();
+            }
+            if ($role == 'user'){
+                header("Location: main.php");
+            } else {
+                header("Location: admin.php");
+            }
+            if($passwordResult['password'] != $hashedPassword) {
+                errorWindow("Wrong password. Please try again.", "Back");
+            }
+        }
 
+        // Close db
+        mysqli_close($conn);
+
+        // Once checks are done, set variables for session
+        $_SESSION['username'] = $username;
+        $_SESSION['password'] = $password;
+    }
 ?>
 
 

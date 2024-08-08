@@ -67,12 +67,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $error = 'Password should be at least 8 characters';
         error_log($error, 3, $logFile);
     } else {
-        // Generate a random salt
-        $salt = bin2hex(random_bytes(5));
-        // Combine the salt with the password
-        $saltedPassword = $password . $salt;
-        // Hash the combined salted password
-        $hashedPassword = password_hash($saltedPassword, PASSWORD_BCRYPT);
+
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
         // Validate and upload profile photo
         $allowedMimeTypes = ['image/jpeg', 'image/png'];
@@ -95,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
                 
                 $photoContent = addslashes(file_get_contents($profilePhoto['tmp_name']));
-                $sql = "INSERT INTO users (fullName, username, email, phone, password, salt, profilePhoto, role) VALUES ('$fullName', '$username', '$email', '$phone', '$hashedPassword', '$salt', '$photoContent', '$role')";
+                $sql = "INSERT INTO users (fullName, username, email, phone, password,profilePhoto, role) VALUES ('$fullName', '$username', '$email', '$phone', '$hashedPassword', '$photoContent', '$role')";
 
                 if ($conn->query($sql) === TRUE) {
                     error_log("User registered successfully: $email", 3, $logFile);
