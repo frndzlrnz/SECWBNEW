@@ -44,6 +44,19 @@
              errorWindow("Invalid user.", "Back");
              exit;
          }
+        if(!isset($_SESSION['username'], $_SESSION['password'])) {
+            errorWindow("No logged in user detected.", "Log In");
+        }
+
+        // Function to log the password change
+        function logPasswordChange($username) {
+            $logFile = 'password_change_log.txt'; // Log file location
+            $currentDate = date('Y-m-d H:i:s');
+            $logMessage = "User: $username changed their password at $currentDate\n";
+
+            // Append the log message to the log file
+            file_put_contents($logFile, $logMessage, FILE_APPEND);
+        }
     ?>
 
     <p>Active User: <b style="text-align: left;"><?php echo $_SESSION['username']; ?></b></p>
@@ -75,7 +88,7 @@
             $newPassword = $_POST['new_password'];
             $confNewPassword = $_POST['conf_new_password'];
 
-            //add to DB
+            // Add to DB
             $conn = mysqli_connect("localhost", "root", "","dbresto","3307") or die("Unable to connect! ".mysqli_error());
             mysqli_select_db($conn, "dbresto");
 
@@ -92,6 +105,9 @@
                 // Update password
                 $updatePass = "UPDATE `tbladmin` SET `password`='$newPassword' WHERE `username`='$sessionUser'";
                 mysqli_query($conn, $updatePass);
+
+                // Log the password change
+                logPasswordChange($sessionUser);
 
                 echo "<p style='color:green'><b>Password changed successfully!<b></p>";
             }

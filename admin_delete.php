@@ -44,6 +44,16 @@
             errorWindow("Invalid user.", "Back");
             exit;
         }
+
+        // Function to log the deletion of a menu item
+        function logMenuDeletion($username, $dishId, $dishName) {
+            $logFile = 'menu_deletion_log.txt'; // Log file location
+            $currentDate = date('Y-m-d H:i:s');
+            $logMessage = "User: $username deleted dish ID: $dishId (Name: $dishName) on $currentDate\n";
+
+            // Append the log message to the log file
+            file_put_contents($logFile, $logMessage, FILE_APPEND);
+        }
     ?>
 
     Active User: <b style="text-align: left;"><?php echo $_SESSION['username']; ?></b>
@@ -79,10 +89,13 @@
                 $dom->loadXML($xml->asXML());
         
                 $root = $dom->documentElement;
+                $dishName = '';
                 foreach($root->childNodes as $dishNode){
                     if($dishNode->nodeName === 'dish'){
                         $idNode = $dishNode->getElementsByTagName('id')->item(0);
+                        $nameNode = $dishNode->getElementsByTagName('name')->item(0);
                         if($idNode && $idNode->nodeValue == $selectedDish){
+                            $dishName = $nameNode->nodeValue;
                             $root->removeChild($dishNode);
                             break;
                         }
@@ -92,13 +105,17 @@
                 // Save the modified XML back to the file
                 $dom->save('dishes.xml');
         
-                //add to DB
+                // Delete from DB
                 $conn = mysqli_connect("localhost", "root", "","dbresto","3307") or die("Unable to connect! ".mysqli_error());
                 mysqli_select_db($conn, "dbresto");
         
                 $deleteString = "DELETE FROM `tblfood` WHERE id = '$selectedDish'";
                 if(mysqli_query($conn, $deleteString)){
                     echo "<p style='color:red'><b>Dish deleted!</b></p>";
+
+                    // Log the deletion
+                    $sessionUser = $_SESSION['username'];
+                    logMenuDeletion($sessionUser, $selectedDish, $dishName);
                 } else {
                     echo "<p style='color:red'><b>Error deleting dish: " . mysqli_error($conn) . "</b></p>";
                     echo "<p style='color:red'><b>Query: $deleteString</b></p>";
