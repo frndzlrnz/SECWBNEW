@@ -13,27 +13,6 @@
             error_reporting(E_ERROR | E_PARSE);
             session_start();
 
-        // // Maximum number of login attempts
-        // $maxLoginAttempts = 3;
-
-        // // Check if the user has exceeded the maximum number of login attempts
-        // if (isset($_SESSION['login_attempts']) && $_SESSION['login_attempts'] >= $maxLoginAttempts) {
-        // // Redirect the user to the timeout page
-        // header('Location: timeout.php');
-        // exit;
-        // }
-
-        // // Increment login attempts
-        // if (isset($_SESSION['login_attempts'])) {
-        // $_SESSION['login_attempts']++;
-        // } else {
-        // $_SESSION['login_attempts'] = 1;
-        // }
-
-        // // Remaining login attempts
-        // $remainingAttempts = $maxLoginAttempts - $_SESSION['login_attempts'];
-
-
             // Open db to select from users
             //add to DB
             $conn = mysqli_connect("localhost", "root", "","dbresto","3307") or die("Unable to connect! ".mysqli_error());
@@ -93,7 +72,6 @@
             }
             
             $conn->close();
-
         ?>
 
         <!-- Actual admin page, if login is successful -->
