@@ -57,7 +57,7 @@
 
             // Verify the provided password against the hashed password from the database
             $saltedPassword = $password . $salt;
-            if (password_verify($saltedPassword, $hashedPassword)) {
+            if (password_verify($hashedPassword, $saltedPassword)) {
               // Password is correct, set session variables
               $_SESSION['loggedin'] = true;
               $_SESSION['username'] = $username;

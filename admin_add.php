@@ -25,7 +25,7 @@
 
         if ($stmt->num_rows == 1) {
             $stmt->bind_result($hashedPassword, 
-        $role);
+            $role);
             $stmt->fetch();
 
             // Check user role (assuming 'admin' role has access)
