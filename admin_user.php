@@ -16,35 +16,7 @@
          $conn = mysqli_connect("localhost", "root", "","dbresto","3307") or die("Unable to connect! ".mysqli_error());
          mysqli_select_db($conn, "dbresto");
  
-          // Check if session is started and user is logged in
-         if (!isset($_SESSION['username'])) {
-         header("Location: login.php");
-         exit;
-         }
- 
-         // Retrieve user information (including password for verification)
-         $username = $_SESSION['username'];
-         $stmt = $conn->prepare("SELECT password, role FROM users WHERE username = ?");
-         $stmt->bind_param("s", $username);
-         $stmt->execute();
-         $stmt->store_result();
- 
-         if ($stmt->num_rows == 1) {
-             $stmt->bind_result($hashedPassword, 
-         $role);
-             $stmt->fetch();
- 
-             // Check user role (assuming 'admin' role has access)
-             if ($role !== 'admin') {
-             header("Location: login.php"); // Redirect to non-admin page
-             exit;
-             }
-         } else {
-             // Handle user not found or invalid role
-             errorWindow("Invalid user.", "Back");
-             exit;
-         }
-        if(!isset($_SESSION['username'], $_SESSION['password'])) {
+         if(!isset($_SESSION['username'], $_SESSION['password'])) {
             errorWindow("No logged in user detected.", "Log In");
         }
 
@@ -92,7 +64,7 @@
             mysqli_select_db($conn, "dbresto");
 
             // Check if username exists
-            $usernameSelect = "SELECT username FROM `tbladmin` WHERE username='$username'";
+            $usernameSelect = "SELECT username FROM `users` WHERE username='$username'";
             $usernameQuery = mysqli_query($conn, $usernameSelect);
 
             if(mysqli_num_rows($usernameQuery) > 0) { // username already exists
@@ -101,7 +73,7 @@
                 echo "<p style='color:red'><b>Passwords do not match. Please try again.<b></p>";
             } else {
                 // Add user to DB
-                $addString = "INSERT INTO `tbladmin` (`username`, `password`) VALUES ('$username','$password')";
+                $addString = "INSERT INTO `users` (`username`, `password`) VALUES ('$username','$password')";
                 mysqli_query($conn, $addString);
 
                 // Log the creation of the new user

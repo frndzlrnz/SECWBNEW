@@ -16,6 +16,7 @@
             errorWindow("No logged in user detected.", "Log In");
         } else {
             session_destroy();
+            unset($_SESSION['recaptcha_verified']);
             echo "<center>";
             echo "<h1>Logged Out</h2>";
             echo "<h2>Session ended. You will be redirected shortly.</h2>";

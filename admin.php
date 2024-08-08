@@ -71,6 +71,7 @@
         $_SESSION['password'] = $password;
     } else {
         // Add reCAPTCHA validation here
+        if (!isset($_SESSION['recaptcha_verified'])) {
         if(isset($_POST['g-recaptcha-response'])) {
           $secret = '6LdpOPMpAAAAALqmJKMKcVtPmVLMwAtO0icKthkT'; // Replace with your actual reCAPTCHA secret key
           $response = $_POST['g-recaptcha-response'];
@@ -78,8 +79,9 @@
 
           $verifyResponse = file_get_contents($url);
           $responseData = json_decode($verifyResponse);
-
-          if(!$responseData->success) {
+          if ($responseData->success){
+          $_SESSION['recaptcha_verified'] = true;
+          } else {
             errorWindow("Failed reCAPTCHA verification. Please try again.", "Back");
             exit();
           }
@@ -87,7 +89,8 @@
           errorWindow("Please verify you are not a robot.", "Back");
           exit();
         }
-      }
+    }
+}
 ?>
 
 
