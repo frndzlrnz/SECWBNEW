@@ -6,73 +6,72 @@
 </head>
 <body>
     <div class="login">
-        <?php
+    <?php
+    // Initialize
+    include("functions.php");
+    error_reporting(E_ERROR | E_PARSE);
+    session_start();
 
-            // Initialize
-            include("functions.php");
-            error_reporting(E_ERROR | E_PARSE);
-            session_start();
+    // Open db to select from tbladmin
+    $conn = mysqli_connect("localhost", "root", "", "dbresto", "3307") or die("Unable to connect! ".mysqli_error());
+    mysqli_select_db($conn, "dbresto");
 
-            // Open db to select from users
-            //add to DB
-            $conn = mysqli_connect("localhost", "root", "","dbresto","3307") or die("Unable to connect! ".mysqli_error());
-            mysqli_select_db($conn, "dbresto");
+    // Function to write log
+    function writeLog($message) {
+        $logFile = 'login_attempts.log';
+        $timestamp = date('Y-m-d H:i:s');
+        $logMessage = "$timestamp - $message" . PHP_EOL;
+        file_put_contents($logFile, $logMessage, FILE_APPEND);
+    }
 
-            // Check connection
-            if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
+    // Check if form is submitted
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        // reCAPTCHA verification
+        $recaptchaSecret = "6LdpOPMpAAAAALqmJKMKcVtPmVLMwAtO0icKthkT";
+        $recaptchaResponse = $_POST['g-recaptcha-response'];
+
+        $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=$recaptchaSecret&response=$recaptchaResponse");
+        $responseKeys = json_decode($response, true);
+
+        if (intval($responseKeys["success"]) !== 1) {
+            writeLog("Failed reCAPTCHA for username: $username");
+            errorWindow("Please complete the reCAPTCHA", "Back");
+            exit;
+        }
+
+        // Proceed with login checks if reCAPTCHA is verified
+        $username = $_POST['username'];
+        $password = $_POST['password'];
+
+        // Check if username exists
+        $usernameSelect = "SELECT username FROM `tbladmin` WHERE username='$username'";
+        $usernameQuery = mysqli_query($conn, $usernameSelect);
+        if(mysqli_num_rows($usernameQuery) == 0) {
+            writeLog("Failed login attempt for non-existing username: $username");
+            errorWindow("Couldn't find your account. Please try again.", "Back");
+        } else {
+            // Check if password is correct
+            $passwordSelect = "SELECT password FROM `tbladmin` WHERE username='$username'";
+            $passwordQuery = mysqli_query($conn, $passwordSelect);
+            $passwordResult = mysqli_fetch_assoc($passwordQuery);
+            if($passwordResult['password'] != $password) {
+                writeLog("Failed login attempt for username: $username - Incorrect password");
+                errorWindow("Wrong password. Please try again.", "Back");
+            } else {
+                writeLog("Successful login for username: $username");
+                $_SESSION['username'] = $username;
+                $_SESSION['password'] = $password;
             }
+        }
 
-            if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-                $username = $_POST['username'];
-                $password = $_POST['password'];
-                $recaptchaResponse = $_POST['g-recaptcha-response'];
-            
-                // Verify the CAPTCHA response
-                $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=$recaptchaSecret&response=$recaptchaResponse");
-                $responseKeys = json_decode($response, true);
-            
-                if (intval($responseKeys["success"]) !== 1) {
-                    $error = "Please complete the CAPTCHA.";
-                } else {
-                    // Prepare and execute SQL statement to retrieve hashed password, salt, and role for the provided username
-                    $stmt = $conn->prepare("SELECT password, salt, role FROM users WHERE username = ?");
-                    $stmt->bind_param("s", $username);
-                    $stmt->execute();
-                    $stmt->store_result();
-            
-                    if ($stmt->num_rows == 1) {
-                        $stmt->bind_result($hashedPassword, $salt, $role);
-                        $stmt->fetch();
-            
-                        // Verify the provided password against the hashed password from the database
-                        $saltedPassword = $password . $salt;
-                        if (password_verify($saltedPassword, $hashedPassword)) {
-                            // Password is correct, set session variables
-                            $_SESSION['loggedin'] = true;
-                            $_SESSION['username'] = $username;
-                            $_SESSION['role'] = $role;
-            
-                            // Redirect based on role
-                            if ($role === 'user') {
-                                header("Location: main.php");
-                            } else {
-                                header("Location: admin.php");
-                            }
-                            exit;
-                        } else {
-                            $error = "Invalid username or password.";
-                        }
-                    } else {
-                        $error = "Invalid username or password.";
-                    }
-            
-                    $stmt->close();
-                }
-            }
-            
-            $conn->close();
-        ?>
+        // Close db
+        mysqli_close($conn);
+    } else {
+        writeLog("No login attempt detected.");
+        errorWindow("No logged in user detected.", "Log In");
+    }
+?>
+
 
         <!-- Actual admin page, if login is successful -->
         Active User: <b style="text-align: left;"><?php echo $_SESSION['username']; ?></b>
