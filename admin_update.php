@@ -11,6 +11,7 @@
         include("functions.php");
         error_reporting(E_ERROR | E_PARSE);
         session_start();
+        session_set_cookie_params(1800);
 
          //add to DB
          $conn = mysqli_connect("localhost", "root", "","dbresto","3307") or die("Unable to connect! ".mysqli_error());
