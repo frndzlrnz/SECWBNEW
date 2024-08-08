@@ -24,56 +24,6 @@
         file_put_contents($logFile, $logMessage, FILE_APPEND);
     }
 
-    // // Check if form is submitted
-    // if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    //     // reCAPTCHA verification
-    //     $recaptchaSecret = "6LdpOPMpAAAAALqmJKMKcVtPmVLMwAtO0icKthkT";
-    //     $recaptchaResponse = $_POST['g-recaptcha-response'];
-
-    //     $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=$recaptchaSecret&response=$recaptchaResponse");
-    //     $responseKeys = json_decode($response, true);
-
-    //     if (intval($responseKeys["success"]) !== 1) {
-    //         writeLog("Failed reCAPTCHA for username: $username");
-    //         errorWindow("Please complete the reCAPTCHA", "Back");
-    //         exit;
-    //     }
-
-    //     // Proceed with login checks if reCAPTCHA is verified
-    //     $username = $_POST['username'];
-    //     $password = $_POST['password'];
-
-    //     // Check if username exists
-    //     $usernameSelect = "SELECT username, salt FROM `users` WHERE username=?";
-    //     $stmt = $conn->prepare($usernameSelect);
-    //     $stmt->bind_param("s", $username);
-    //     $stmt->execute();
-    //     $stmt->store_result();
-
-    //     if ($stmt->num_rows == 0) {
-    //         writeLog("Failed login attempt for non-existing username: $username");
-    //         errorWindow("Couldn't find your account. Please try again.", "Back");
-    //     } else {
-    //         $stmt->bind_result($username, $salt); // Retrieve username and salt
-    //         $stmt->fetch();
-
-    //         // Verify the password using password_verify
-    //         if (password_verify($password, $salt)) {
-    //         // Password is correct
-    //         writeLog("Successful login for username: $username");
-    //         $_SESSION['username'] = $username;
-    //         exit;
-    //         } else {
-    //         writeLog("Failed login attempt for username: $username - Incorrect password");
-    //         errorWindow("Wrong password. Please try again.", "Back");
-    //         }
-    //     }
-    //     mysqli_close($conn);
-    //     } else {
-    //     writeLog("No login attempt detected.");
-    //     errorWindow("No logged in user detected.", "Log In");
-    //     }
-
       // Checking if session hasn't started yet
       if(!isset($_SESSION['username'], $_SESSION['password'])) {
         $username = $_POST['username'];
@@ -119,7 +69,25 @@
         // Once checks are done, set variables for session
         $_SESSION['username'] = $username;
         $_SESSION['password'] = $password;
-    }
+    } else {
+        // Add reCAPTCHA validation here
+        if(isset($_POST['g-recaptcha-response'])) {
+          $secret = '6LdpOPMpAAAAALqmJKMKcVtPmVLMwAtO0icKthkT'; // Replace with your actual reCAPTCHA secret key
+          $response = $_POST['g-recaptcha-response'];
+          $url = "https://www.google.com/recaptcha/api/siteverify?secret=$secret&response=$response";
+
+          $verifyResponse = file_get_contents($url);
+          $responseData = json_decode($verifyResponse);
+
+          if(!$responseData->success) {
+            errorWindow("Failed reCAPTCHA verification. Please try again.", "Back");
+            exit();
+          }
+        } else {
+          errorWindow("Please verify you are not a robot.", "Back");
+          exit();
+        }
+      }
 ?>
 
 
