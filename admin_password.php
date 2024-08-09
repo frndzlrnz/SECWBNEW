@@ -65,36 +65,40 @@
 
         <?php
         if(isset($_POST['pass_submit'])) {
-            $sessionUser = $_SESSION['username'];
-            $password = $_POST['password'];
-            $newPassword = $_POST['new_password'];
-            $confNewPassword = $_POST['conf_new_password'];
+        $sessionUser = $_SESSION['username'];
+        $password = $_POST['password'];
+        $newPassword = $_POST['new_password'];
+        $confNewPassword = $_POST['conf_new_password'];
 
-            // Add to DB
-            $conn = mysqli_connect("localhost", "root", "","dbresto","3307") or die("Unable to connect! ".mysqli_error());
-            mysqli_select_db($conn, "dbresto");
+        // Add to DB
+        $conn = mysqli_connect("localhost", "root", "","dbresto","3307") or die("Unable to connect! ".mysqli_error());
+        mysqli_select_db($conn, "dbresto");
 
-            // Check if current password matches
-            $passwordSelect = "SELECT password FROM `tbladmin` WHERE username='$sessionUser'";
-            $passwordQuery = mysqli_query($conn, $passwordSelect);
-            $passwordResult = mysqli_fetch_assoc($passwordQuery);
+        // Check if current password matches
+        $passwordSelect = "SELECT password FROM `users` WHERE username='$sessionUser'";
+        $passwordQuery = mysqli_query($conn, $passwordSelect);
+        $passwordResult = mysqli_fetch_assoc($passwordQuery);
 
-            if($passwordResult['password'] != $password) { // current password incorrect
-                echo "<p style='color:red'><b>The current password you have entered does not match your account's password. Please try again.<b></p>";
-            } else if($newPassword !== $confNewPassword) { // new password and confirm new password don't match
-                echo "<p style='color:red'><b>New password does not match new password confirmation. Please try again.<b></p>";
-            } else {
-                // Update password
-                $updatePass = "UPDATE `tbladmin` SET `password`='$newPassword' WHERE `username`='$sessionUser'";
-                mysqli_query($conn, $updatePass);
+        // Verify password using password_verify()
+        if (!password_verify($password, $passwordResult['password'])) {
+        echo "<p style='color:red'><b>The current password you have entered does not match your account's password. Please try again.<b></p>";
+        } else if($newPassword !== $confNewPassword) { // new password and confirm new password don't match
+        echo "<p style='color:red'><b>New password does not match new password confirmation. Please try again.<b></p>";
+        } else {
+        // Hash the new password
+        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
 
-                // Log the password change
-                logPasswordChange($sessionUser);
+        // Update password
+        $updatePass = "UPDATE `users` SET `password`='$hashedPassword' WHERE `username`='$sessionUser'";
+        mysqli_query($conn, $updatePass);
 
-                echo "<p style='color:green'><b>Password changed successfully!<b></p>";
-            }
+        // Log the password change
+        logPasswordChange($sessionUser);
+
+        echo "<p style='color:green'><b>Password changed successfully!<b></p>";
         }
-        ?>
+        }
+?>
     </form><br>
 
         <p><a href='admin.php'><button class='btn'>Back</button></a></p>

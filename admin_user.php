@@ -64,35 +64,38 @@
         <input type="submit" class="btn" name="add_submit" value="Add User">
 
         <?php
-        if(isset($_POST['add_submit'])) {
-            $username = $_POST['username'];
-            $password = $_POST['password'];
-            $confPassword = $_POST['conf_password'];
+    if(isset($_POST['add_submit'])) {
+      $username = $_POST['username'];
+      $password = $_POST['password'];
+      $confPassword = $_POST['conf_password'];
 
-            // Add to DB
-            $conn = mysqli_connect("localhost", "root", "","dbresto","3307") or die("Unable to connect! ".mysqli_error());
-            mysqli_select_db($conn, "dbresto");
+      // Add to DB
+      $conn = mysqli_connect("localhost", "root", "","dbresto","3307") or die("Unable to connect! ".mysqli_error());
+      mysqli_select_db($conn, "dbresto");
 
-            // Check if username exists
-            $usernameSelect = "SELECT username FROM `users` WHERE username='$username'";
-            $usernameQuery = mysqli_query($conn, $usernameSelect);
+      // Check if username exists
+      $usernameSelect = "SELECT username FROM `users` WHERE username='$username'";
+      $usernameQuery = mysqli_query($conn, $usernameSelect);
 
-            if(mysqli_num_rows($usernameQuery) > 0) { // username already exists
-                echo "<p style='color:red'><b>Username already exists!<b></p>";
-            } else if($password !== $confPassword) { // password and confirm password don't match
-                echo "<p style='color:red'><b>Passwords do not match. Please try again.<b></p>";
-            } else {
-                // Add user to DB
-                $addString = "INSERT INTO `users` (`username`, `password`) VALUES ('$username','$password')";
-                mysqli_query($conn, $addString);
+      if(mysqli_num_rows($usernameQuery) > 0) { // username already exists
+        echo "<p style='color:red'><b>Username already exists!<b></p>";
+      } else if($password !== $confPassword) { // password and confirm password don't match
+        echo "<p style='color:red'><b>Passwords do not match. Please try again.<b></p>";
+      } else {
+        // Hash the password
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-                // Log the creation of the new user
-                logUserCreation($username);
+        // Add user to DB
+        $addString = "INSERT INTO `users` (`username`, `password`) VALUES ('$username','$hashedPassword')";
+        mysqli_query($conn, $addString);
 
-                echo "<p style='color:green'><b>User added successfully!<b></p>";
-            }
-        }
-        ?>
+        // Log the creation of the new user
+        logUserCreation($username);
+
+        echo "<p style='color:green'><b>User added successfully!<b></p>";
+      }
+    }
+    ?>
     </form><br>
 
         <p><a href='admin.php'><button class='btn'>Back</button></a></p>
