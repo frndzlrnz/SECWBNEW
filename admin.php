@@ -43,11 +43,13 @@
       if(!isset($_SESSION['username'], $_SESSION['password'])) {
         $username = $_POST['username'];
         $password = $_POST['password'];
+        $role = $_POST['role'];
 
         // First check: if user is not logged in, hide page
         if(!isset($_POST['username'], $_POST['password'])) {
             errorWindow("No logged in user detected.", "Log In");
         }
+
     
         // Check if username exists
         $usernameSelect = "SELECT username FROM `users` WHERE username='$username'";
@@ -75,6 +77,9 @@
             }
             if($passwordResult['password'] != $hashedPassword) {
                 errorWindow("Wrong password. Please try again.", "Back");
+            }
+            if($role != 'admin') {
+                errorWindow("Unauthorized Access", "Back");
             }
         }
 
